@@ -3,6 +3,7 @@
     "name": "zooger-panda-claude",
     "slug": "zooger-panda-claude",
     "version": "1.0.0",
+    "scheme": "zoogerpanda",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,6 +21,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-status-bar"
+    ]
   }
 }
