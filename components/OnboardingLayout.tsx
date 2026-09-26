@@ -1,15 +1,19 @@
 import { PropsWithChildren } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { colors } from '../constants/theme';
 import { Button } from './Button';
+import { PageTitle } from './PageTitle';
+import { PandaMascot } from './PandaMascot';
 import { ProgressBar } from './ProgressBar';
 import { ScreenContainer } from './ScreenContainer';
-import { colors, fontSize, spacing } from '../constants/theme';
 
 type Props = PropsWithChildren<{
   step: number;
   totalSteps: number;
   title: string;
   subtitle?: string;
+  // Short helper message from the panda, shown below the step's content.
+  tip?: string;
   onBack?: () => void;
   onContinue: () => void;
   continueDisabled?: boolean;
@@ -21,6 +25,7 @@ export function OnboardingLayout({
   totalSteps,
   title,
   subtitle,
+  tip,
   onBack,
   onContinue,
   continueDisabled,
@@ -28,14 +33,28 @@ export function OnboardingLayout({
   children,
 }: Props) {
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll backgroundColor={colors.pageBackground}>
       <ProgressBar step={step} totalSteps={totalSteps} />
-      <Text style={styles.title}>{title}</Text>
-      {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+      <View className={subtitle ? 'mb-lg' : 'mb-sm'}>
+        <PageTitle size="compact" title={title} subtitle={subtitle} />
+      </View>
 
-      <View style={styles.content}>{children}</View>
+      {/* grow shrink-0 basis-0 matches React Native's `flex: 1` exactly;
+          NativeWind's flex-1 compiles to CSS semantics (shrink 1, basis 0%). */}
+      <View className="grow shrink-0 basis-0 mt-sm">{children}</View>
 
-      <View style={styles.actions}>
+      {/* Outside the growing content area so it sits just above the buttons. */}
+      {tip && (
+        // Borderless pill so it reads as a note, not another selectable option.
+        <View className="flex-row items-center mt-md rounded-full bg-primaryLight py-xs pl-xs pr-md">
+          <View className="w-[44px] h-[44px] rounded-full bg-background items-center justify-center mr-sm">
+            <PandaMascot size={32} />
+          </View>
+          <Text className="flex-1 text-[13px] leading-[18px] text-textPrimary">{tip}</Text>
+        </View>
+      )}
+
+      <View className="flex-row gap-md mt-lg">
         {onBack && <Button label="Back" variant="outline" onPress={onBack} style={styles.backButton} />}
         <Button
           label={continueLabel}
@@ -48,27 +67,9 @@ export function OnboardingLayout({
   );
 }
 
+// Button only accepts `style?: ViewStyle` (no className), so the flex ratios
+// for the action buttons stay as StyleSheet styles.
 const styles = StyleSheet.create({
-  title: {
-    fontSize: fontSize.xl,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    fontSize: fontSize.md,
-    color: colors.textSecondary,
-    marginBottom: spacing.lg,
-  },
-  content: {
-    flex: 1,
-    marginTop: spacing.sm,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.lg,
-  },
   backButton: {
     flex: 1,
   },

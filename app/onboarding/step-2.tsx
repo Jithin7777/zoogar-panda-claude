@@ -1,10 +1,15 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { useRef } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Text, TextInput, View } from 'react-native';
+import { Card } from '../../components/Card';
 import { OnboardingLayout } from '../../components/OnboardingLayout';
 import { SelectableOption } from '../../components/SelectableOption';
 import { TextField } from '../../components/TextField';
-import { colors, fontSize, spacing } from '../../constants/theme';
+import { spacing } from '../../constants/theme';
 import { useProfile } from '../../context/ProfileContext';
+import { stepTwoSchema } from '../../lib/validation';
 import { ActivityLevel, Gender } from '../../types/user';
 
 const genderOptions: { label: string; value: Gender }[] = [
@@ -14,74 +19,151 @@ const genderOptions: { label: string; value: Gender }[] = [
   { label: 'Prefer not to say', value: 'prefer_not_to_say' },
 ];
 
-const activityOptions: { label: string; value: ActivityLevel }[] = [
-  { label: 'Low', value: 'low' },
-  { label: 'Moderate', value: 'moderate' },
-  { label: 'High', value: 'high' },
+const activityOptions: { label: string; description: string; value: ActivityLevel }[] = [
+  { label: 'Low', description: 'Mostly sitting or little exercise', value: 'low' },
+  { label: 'Moderate', description: 'Some regular exercise', value: 'moderate' },
+  { label: 'High', description: 'Very active most days', value: 'high' },
 ];
+
+// Each card's last child already adds space below itself (options mb-sm,
+// fields mb-md), so trim the card's bottom padding to keep it visually even.
+const optionsCardStyle = { paddingBottom: spacing.md };
+const fieldsCardStyle = { paddingBottom: spacing.sm };
+
+const cardTitleClassName = 'text-md font-bold text-textPrimary mb-md';
 
 export default function OnboardingStepTwo() {
   const { profile, updateDraft } = useProfile();
+  const weightRef = useRef<TextInput>(null);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm({
+    resolver: zodResolver(stepTwoSchema),
+    mode: 'onChange',
+    defaultValues: {
+      gender: profile.gender,
+      height: profile.height ?? '',
+      weight: profile.weight ?? '',
+      activityLevel: profile.activityLevel,
+    },
+  });
 
   return (
     <OnboardingLayout
       step={2}
-      totalSteps={4}
+      totalSteps={5}
       title="A little about you"
+      subtitle="All optional — it helps us personalise your goal."
+      tip="You can update these later in Profile."
       onBack={() => router.back()}
-      onContinue={() => router.push('/onboarding/step-3')}
+      onContinue={handleSubmit(() => router.push('/onboarding/step-3'))}
+      continueDisabled={!isValid}
     >
-      <Text style={styles.sectionLabel}>Gender (optional)</Text>
-      <View style={styles.optionsWrap}>
-        {genderOptions.map((option) => (
-          <SelectableOption
-            key={option.value}
-            label={option.label}
-            selected={profile.gender === option.value}
-            onPress={() => updateDraft({ gender: option.value })}
-          />
-        ))}
+      <Card style={optionsCardStyle}>
+        <Text className={cardTitleClassName}>Gender (optional)</Text>
+        <Controller
+          control={control}
+          name="gender"
+          render={({ field: { value, onChange } }) => (
+            <>
+              {genderOptions.map((option) => (
+                <SelectableOption
+                  key={option.value}
+                  label={option.label}
+                  selected={value === option.value}
+                  onPress={() => {
+                    onChange(option.value);
+                    updateDraft({ gender: option.value });
+                  }}
+                />
+              ))}
+            </>
+          )}
+        />
+      </Card>
+
+      <View className="mt-lg">
+        <Card style={fieldsCardStyle}>
+          <Text className={cardTitleClassName}>Body information (optional)</Text>
+          <View className="flex-row gap-md">
+            <View className="flex-1">
+              <Controller
+                control={control}
+                name="height"
+                render={({ field: { value, onChange, onBlur } }) => (
+                  <TextField
+                    compact
+                    label="Height (cm)"
+                    placeholder="e.g. 170"
+                    keyboardType="number-pad"
+                    returnKeyType="next"
+                    submitBehavior="submit"
+                    onSubmitEditing={() => weightRef.current?.focus()}
+                    value={value}
+                    onChangeText={(height) => {
+                      onChange(height);
+                      updateDraft({ height });
+                    }}
+                    onBlur={onBlur}
+                    error={errors.height?.message}
+                  />
+                )}
+              />
+            </View>
+            <View className="flex-1">
+              <Controller
+                control={control}
+                name="weight"
+                render={({ field: { value, onChange, onBlur } }) => (
+                  <TextField
+                    compact
+                    ref={weightRef}
+                    label="Weight (kg)"
+                    placeholder="e.g. 65"
+                    keyboardType="number-pad"
+                    returnKeyType="done"
+                    value={value}
+                    onChangeText={(weight) => {
+                      onChange(weight);
+                      updateDraft({ weight });
+                    }}
+                    onBlur={onBlur}
+                    error={errors.weight?.message}
+                  />
+                )}
+              />
+            </View>
+          </View>
+        </Card>
       </View>
 
-      <TextField
-        label="Height in cm (optional)"
-        placeholder="e.g. 170"
-        keyboardType="number-pad"
-        value={profile.height ?? ''}
-        onChangeText={(height) => updateDraft({ height })}
-      />
-      <TextField
-        label="Weight in kg (optional)"
-        placeholder="e.g. 65"
-        keyboardType="number-pad"
-        value={profile.weight ?? ''}
-        onChangeText={(weight) => updateDraft({ weight })}
-      />
-
-      <Text style={styles.sectionLabel}>Activity level</Text>
-      <View style={styles.optionsWrap}>
-        {activityOptions.map((option) => (
-          <SelectableOption
-            key={option.value}
-            label={option.label}
-            selected={profile.activityLevel === option.value}
-            onPress={() => updateDraft({ activityLevel: option.value })}
+      <View className="mt-lg">
+        <Card style={optionsCardStyle}>
+          <Text className={cardTitleClassName}>Activity level</Text>
+          <Controller
+            control={control}
+            name="activityLevel"
+            render={({ field: { value, onChange } }) => (
+              <>
+                {activityOptions.map((option) => (
+                  <SelectableOption
+                    key={option.value}
+                    label={option.label}
+                    description={option.description}
+                    selected={value === option.value}
+                    onPress={() => {
+                      onChange(option.value);
+                      updateDraft({ activityLevel: option.value });
+                    }}
+                  />
+                ))}
+              </>
+            )}
           />
-        ))}
+        </Card>
       </View>
     </OnboardingLayout>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionLabel: {
-    fontSize: fontSize.sm,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  optionsWrap: {
-    marginBottom: spacing.md,
-  },
-});

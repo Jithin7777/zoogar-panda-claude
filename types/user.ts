@@ -6,6 +6,8 @@ export type SugarFrequency = 'rarely' | 'sometimes' | 'daily' | 'several_times_d
 
 export type Goal = 'reduce_sugar' | 'maintain_habits' | 'build_healthier_habits';
 
+export type MealsPerDay = '1' | '2' | '3' | '4' | '5_plus';
+
 export interface UserProfile {
   name: string;
   age: string;
@@ -15,6 +17,7 @@ export interface UserProfile {
   activityLevel?: ActivityLevel;
   sugarConsumptionFrequency?: SugarFrequency;
   goal?: Goal;
+  mealsPerDay?: MealsPerDay;
   onboardingCompleted: boolean;
 }
 

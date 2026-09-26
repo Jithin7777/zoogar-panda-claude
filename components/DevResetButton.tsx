@@ -1,7 +1,6 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, fontSize, radius, spacing } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 
@@ -20,26 +19,16 @@ export function DevResetButton() {
   };
 
   return (
-    <Pressable style={[styles.button, { top: insets.top + spacing.sm }]} onPress={handleReset}>
-      <Text style={styles.label}>Reset App Data</Text>
-    </Pressable>
+    // Centered just below the status bar so it never covers header actions
+    // (e.g. the Home notification bell). The wrapper passes touches through.
+    <View
+      className="absolute left-0 right-0 items-center z-[999] pointer-events-box-none"
+      // Safe-area inset is only known at runtime, so the offset stays inline.
+      style={{ top: insets.top }}
+    >
+      <Pressable className="bg-danger px-md py-xs rounded-full opacity-90" onPress={handleReset}>
+        <Text className="text-white text-sm font-bold">Reset App Data</Text>
+      </Pressable>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    position: 'absolute',
-    right: spacing.md,
-    backgroundColor: colors.danger,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.full,
-    opacity: 0.9,
-    zIndex: 999,
-  },
-  label: {
-    color: colors.white,
-    fontSize: fontSize.sm,
-    fontWeight: '700',
-  },
-});

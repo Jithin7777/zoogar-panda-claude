@@ -1,48 +1,46 @@
 import { router } from 'expo-router';
-import { StyleSheet, Text } from 'react-native';
+import { useState } from 'react';
+import { View } from 'react-native';
 import { Button } from '../../components/Button';
+import { PageTitle } from '../../components/PageTitle';
 import { PandaMascot } from '../../components/PandaMascot';
 import { ScreenContainer } from '../../components/ScreenContainer';
-import { colors, fontSize, spacing } from '../../constants/theme';
+import { colors } from '../../constants/theme';
 import { useProfile } from '../../context/ProfileContext';
 
 export default function OnboardingComplete() {
-  const { completeOnboarding } = useProfile();
+  const { profile, completeOnboarding } = useProfile();
+  const [isSaving, setIsSaving] = useState(false);
+  const name = profile.name.trim();
 
   const handleContinue = async () => {
-    await completeOnboarding();
-    router.replace('/home');
+    setIsSaving(true);
+    try {
+      await completeOnboarding();
+      router.replace('/home');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
-    <ScreenContainer style={styles.container}>
-      <PandaMascot size={160} />
-      <Text style={styles.title}>You're all set! 🎉</Text>
-      <Text style={styles.subtitle}>Let's start building healthier habits together.</Text>
-      <Button label="Continue" onPress={handleContinue} style={styles.button} />
+    <ScreenContainer backgroundColor={colors.pageBackground}>
+      <View className="flex-1 items-center justify-center">
+        <View className="w-[200px] h-[200px] rounded-full bg-primaryLight items-center justify-center">
+          <PandaMascot size={150} />
+        </View>
+
+        <View className="mt-xl">
+          <PageTitle
+            centered
+            size="celebration"
+            title={name ? `You're all set, ${name}! 🎉` : "You're all set! 🎉"}
+            subtitle="Let's start building healthier habits together."
+          />
+        </View>
+      </View>
+
+      <Button label="Continue" onPress={handleContinue} loading={isSaving} />
     </ScreenContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.md,
-  },
-  title: {
-    fontSize: fontSize.xxl,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: fontSize.md,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  button: {
-    width: '100%',
-  },
-});

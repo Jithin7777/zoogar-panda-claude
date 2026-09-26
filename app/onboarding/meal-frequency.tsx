@@ -4,41 +4,44 @@ import { Controller, useForm } from 'react-hook-form';
 import { OnboardingLayout } from '../../components/OnboardingLayout';
 import { SelectableOption } from '../../components/SelectableOption';
 import { useProfile } from '../../context/ProfileContext';
-import { StepFourValues, stepFourSchema } from '../../lib/validation';
-import { Goal } from '../../types/user';
+import { MealFrequencyValues, mealFrequencySchema } from '../../lib/validation';
+import { MealsPerDay } from '../../types/user';
 
-const options: { label: string; value: Goal }[] = [
-  { label: 'Reduce my sugar intake', value: 'reduce_sugar' },
-  { label: 'Maintain my current habits', value: 'maintain_habits' },
-  { label: 'Build healthier eating habits', value: 'build_healthier_habits' },
+const options: { label: string; value: MealsPerDay }[] = [
+  { label: '1 meal', value: '1' },
+  { label: '2 meals', value: '2' },
+  { label: '3 meals', value: '3' },
+  { label: '4 meals', value: '4' },
+  { label: '5+ meals', value: '5_plus' },
 ];
 
-export default function OnboardingStepFour() {
+export default function OnboardingMealFrequency() {
   const { profile, updateDraft } = useProfile();
   const {
     control,
     handleSubmit,
     formState: { isValid },
-  } = useForm<StepFourValues>({
-    resolver: zodResolver(stepFourSchema),
+  } = useForm<MealFrequencyValues>({
+    resolver: zodResolver(mealFrequencySchema),
     mode: 'onChange',
-    defaultValues: { goal: profile.goal },
+    defaultValues: { mealsPerDay: profile.mealsPerDay },
   });
 
   return (
     <OnboardingLayout
-      step={4}
+      step={5}
       totalSteps={5}
-      title="What is your main goal?"
-      subtitle="Choose the goal that best fits you."
-      tip="Pick the goal that feels right to you."
+      title="How many meals a day?"
+      subtitle="Count your main meals like breakfast, lunch, and dinner."
+      tip="This helps me set up your daily plan."
       onBack={() => router.back()}
-      onContinue={handleSubmit(() => router.push('/onboarding/meal-frequency'))}
+      onContinue={handleSubmit(() => router.push('/onboarding/complete'))}
       continueDisabled={!isValid}
+      continueLabel="Finish"
     >
       <Controller
         control={control}
-        name="goal"
+        name="mealsPerDay"
         render={({ field: { value, onChange } }) => (
           <>
             {options.map((option) => (
@@ -48,7 +51,7 @@ export default function OnboardingStepFour() {
                 selected={value === option.value}
                 onPress={() => {
                   onChange(option.value);
-                  updateDraft({ goal: option.value });
+                  updateDraft({ mealsPerDay: option.value });
                 }}
               />
             ))}

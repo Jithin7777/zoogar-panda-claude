@@ -1,5 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { colors, fontSize, radius, spacing } from '../constants/theme';
+import { Text, View } from 'react-native';
 
 type Props = {
   step: number;
@@ -10,36 +9,13 @@ export function ProgressBar({ step, totalSteps }: Props) {
   const progress = step / totalSteps;
 
   return (
-    <View style={styles.wrapper}>
-      <Text style={styles.label}>
+    <View className="mb-lg">
+      <Text className="text-[13px] font-medium text-textSecondary mb-sm">
         Step {step} of {totalSteps}
       </Text>
-      <View style={styles.track}>
-        <View style={[styles.fill, { width: `${progress * 100}%` }]} />
+      <View className="h-[8px] rounded-full bg-border overflow-hidden">
+        <View className="h-full rounded-full bg-primary" style={{ width: `${progress * 100}%` }} />
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    marginBottom: spacing.lg,
-  },
-  label: {
-    fontSize: fontSize.sm,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-  },
-  track: {
-    height: 8,
-    borderRadius: radius.full,
-    backgroundColor: colors.border,
-    overflow: 'hidden',
-  },
-  fill: {
-    height: '100%',
-    borderRadius: radius.full,
-    backgroundColor: colors.primary,
-  },
-});

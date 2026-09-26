@@ -3,12 +3,15 @@ export const colors = {
   primaryDark: '#1F8F4C',
   primaryLight: '#E6F6EC',
   background: '#FFFFFF',
+  // Light grey page behind white cards/inputs (auth + onboarding screens).
+  pageBackground: '#F7F7F7',
   surface: '#F5F8F6',
   border: '#E3ECE6',
   textPrimary: '#1C2B22',
   textSecondary: '#6B7B72',
   textOnPrimary: '#FFFFFF',
   danger: '#E4574C',
+  warning: '#F5A524',
   white: '#FFFFFF',
   black: '#000000',
 };
