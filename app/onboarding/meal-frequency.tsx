@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { OnboardingLayout } from '../../components/OnboardingLayout';
 import { SelectableOption } from '../../components/SelectableOption';
-import { useProfile } from '../../context/ProfileContext';
+import { useOnboardingDraft } from '../../hooks/useOnboardingDraft';
 import { MealFrequencyValues, mealFrequencySchema } from '../../lib/validation';
 import { MealsPerDay } from '../../types/user';
 
@@ -16,7 +16,7 @@ const options: { label: string; value: MealsPerDay }[] = [
 ];
 
 export default function OnboardingMealFrequency() {
-  const { profile, updateDraft } = useProfile();
+  const { draft, updateDraft } = useOnboardingDraft();
   const {
     control,
     handleSubmit,
@@ -24,7 +24,7 @@ export default function OnboardingMealFrequency() {
   } = useForm<MealFrequencyValues>({
     resolver: zodResolver(mealFrequencySchema),
     mode: 'onChange',
-    defaultValues: { mealsPerDay: profile.mealsPerDay },
+    defaultValues: { mealsPerDay: draft.mealsPerDay },
   });
 
   return (

@@ -5,8 +5,8 @@ import { Button } from '../components/Button';
 import { PandaMascot } from '../components/PandaMascot';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { colors } from '../constants/theme';
-import { useAuth } from '../context/AuthContext';
-import { useProfile } from '../context/ProfileContext';
+import { useAuth } from '../hooks/useAuth';
+import { useProfile } from '../hooks/useProfile';
 
 export default function WelcomeScreen() {
   const { user } = useAuth();

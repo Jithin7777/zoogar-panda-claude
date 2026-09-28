@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { OnboardingLayout } from '../../components/OnboardingLayout';
 import { SelectableOption } from '../../components/SelectableOption';
-import { useProfile } from '../../context/ProfileContext';
+import { useOnboardingDraft } from '../../hooks/useOnboardingDraft';
 import { StepThreeValues, stepThreeSchema } from '../../lib/validation';
 import { SugarFrequency } from '../../types/user';
 
@@ -15,7 +15,7 @@ const options: { label: string; value: SugarFrequency }[] = [
 ];
 
 export default function OnboardingStepThree() {
-  const { profile, updateDraft } = useProfile();
+  const { draft, updateDraft } = useOnboardingDraft();
   const {
     control,
     handleSubmit,
@@ -23,7 +23,7 @@ export default function OnboardingStepThree() {
   } = useForm<StepThreeValues>({
     resolver: zodResolver(stepThreeSchema),
     mode: 'onChange',
-    defaultValues: { sugarConsumptionFrequency: profile.sugarConsumptionFrequency },
+    defaultValues: { sugarConsumptionFrequency: draft.sugarConsumptionFrequency },
   });
 
   return (

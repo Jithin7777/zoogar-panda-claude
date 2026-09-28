@@ -10,8 +10,8 @@ import { PandaMascot } from '../components/PandaMascot';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { TextField } from '../components/TextField';
 import { colors } from '../constants/theme';
-import { useAuth } from '../context/AuthContext';
-import { useProfile } from '../context/ProfileContext';
+import { useAuth } from '../hooks/useAuth';
+import { useProfile } from '../hooks/useProfile';
 import { LoginValues, loginSchema } from '../lib/validation';
 
 export default function LoginScreen() {

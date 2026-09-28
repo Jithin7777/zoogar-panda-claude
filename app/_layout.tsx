@@ -2,18 +2,22 @@ import '../global.css';
 
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DevResetButton } from '../components/DevResetButton';
 import { colors } from '../constants/theme';
-import { AuthProvider, useAuth } from '../context/AuthContext';
-import { ProfileProvider, useProfile } from '../context/ProfileContext';
+import { useStoresHydrated } from '../hooks/useStoresHydrated';
+import { clearLegacyStorageOnce } from '../lib/storage';
 
 function AppGate() {
-  const { isLoading: authLoading } = useAuth();
-  const { isLoading: profileLoading } = useProfile();
+  const storesHydrated = useStoresHydrated();
 
-  if (authLoading || profileLoading) {
+  useEffect(() => {
+    if (storesHydrated) clearLegacyStorageOnce();
+  }, [storesHydrated]);
+
+  if (!storesHydrated) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -32,11 +36,7 @@ function AppGate() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <ProfileProvider>
-          <AppGate />
-        </ProfileProvider>
-      </AuthProvider>
+      <AppGate />
       <StatusBar style="dark" />
     </SafeAreaProvider>
   );

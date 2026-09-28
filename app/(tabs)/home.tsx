@@ -6,7 +6,7 @@ import { StreakCalendarCard } from "../../components/home/StreakCalendarCard";
 import { SugarProgressCard } from "../../components/home/SugarProgressCard";
 import { ScreenContainer } from "../../components/ScreenContainer";
 import { spacing } from "../../constants/theme";
-import { useProfile } from "../../context/ProfileContext";
+import { useProfile } from "../../hooks/useProfile";
 import { MOCK_STREAK_DAYS, MOCK_SUGAR_TODAY } from "../../lib/mockHome";
 
 // Floating tab bar sizes set in app/(tabs)/_layout.tsx.

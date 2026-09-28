@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { OnboardingLayout } from '../../components/OnboardingLayout';
 import { SelectableOption } from '../../components/SelectableOption';
-import { useProfile } from '../../context/ProfileContext';
+import { useOnboardingDraft } from '../../hooks/useOnboardingDraft';
 import { StepFourValues, stepFourSchema } from '../../lib/validation';
 import { Goal } from '../../types/user';
 
@@ -14,7 +14,7 @@ const options: { label: string; value: Goal }[] = [
 ];
 
 export default function OnboardingStepFour() {
-  const { profile, updateDraft } = useProfile();
+  const { draft, updateDraft } = useOnboardingDraft();
   const {
     control,
     handleSubmit,
@@ -22,7 +22,7 @@ export default function OnboardingStepFour() {
   } = useForm<StepFourValues>({
     resolver: zodResolver(stepFourSchema),
     mode: 'onChange',
-    defaultValues: { goal: profile.goal },
+    defaultValues: { goal: draft.goal },
   });
 
   return (

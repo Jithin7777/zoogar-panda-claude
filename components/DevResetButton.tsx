@@ -1,20 +1,16 @@
 import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuth } from '../context/AuthContext';
-import { useProfile } from '../context/ProfileContext';
+import { resetAppData } from '../lib/resetAppData';
 
 // Testing helper only. Hidden automatically in production builds via __DEV__.
 export function DevResetButton() {
   const insets = useSafeAreaInsets();
-  const { logout } = useAuth();
-  const { resetProfile } = useProfile();
 
   if (!__DEV__) return null;
 
   const handleReset = async () => {
-    await logout();
-    await resetProfile();
+    await resetAppData();
     router.replace('/');
   };
 

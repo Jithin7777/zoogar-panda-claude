@@ -8,7 +8,7 @@ import { OnboardingLayout } from '../../components/OnboardingLayout';
 import { SelectableOption } from '../../components/SelectableOption';
 import { TextField } from '../../components/TextField';
 import { spacing } from '../../constants/theme';
-import { useProfile } from '../../context/ProfileContext';
+import { useOnboardingDraft } from '../../hooks/useOnboardingDraft';
 import { stepTwoSchema } from '../../lib/validation';
 import { ActivityLevel, Gender } from '../../types/user';
 
@@ -33,7 +33,7 @@ const fieldsCardStyle = { paddingBottom: spacing.sm };
 const cardTitleClassName = 'text-md font-bold text-textPrimary mb-md';
 
 export default function OnboardingStepTwo() {
-  const { profile, updateDraft } = useProfile();
+  const { draft, updateDraft } = useOnboardingDraft();
   const weightRef = useRef<TextInput>(null);
   const {
     control,
@@ -43,10 +43,10 @@ export default function OnboardingStepTwo() {
     resolver: zodResolver(stepTwoSchema),
     mode: 'onChange',
     defaultValues: {
-      gender: profile.gender,
-      height: profile.height ?? '',
-      weight: profile.weight ?? '',
-      activityLevel: profile.activityLevel,
+      gender: draft.gender,
+      height: draft.height ?? '',
+      weight: draft.weight ?? '',
+      activityLevel: draft.activityLevel,
     },
   });
 

@@ -10,13 +10,13 @@ import { PandaMascot } from '../components/PandaMascot';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { TextField } from '../components/TextField';
 import { colors } from '../constants/theme';
-import { useAuth } from '../context/AuthContext';
-import { useProfile } from '../context/ProfileContext';
+import { useAuth } from '../hooks/useAuth';
+import { useOnboardingDraft } from '../hooks/useOnboardingDraft';
 import { SignupValues, signupSchema } from '../lib/validation';
 
 export default function SignUpScreen() {
   const { signup, loginWithGoogle } = useAuth();
-  const { updateDraft } = useProfile();
+  const { updateDraft } = useOnboardingDraft();
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);

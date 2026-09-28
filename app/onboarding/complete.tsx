@@ -6,12 +6,12 @@ import { PageTitle } from '../../components/PageTitle';
 import { PandaMascot } from '../../components/PandaMascot';
 import { ScreenContainer } from '../../components/ScreenContainer';
 import { colors } from '../../constants/theme';
-import { useProfile } from '../../context/ProfileContext';
+import { useOnboardingDraft } from '../../hooks/useOnboardingDraft';
 
 export default function OnboardingComplete() {
-  const { profile, completeOnboarding } = useProfile();
+  const { draft, completeOnboarding } = useOnboardingDraft();
   const [isSaving, setIsSaving] = useState(false);
-  const name = profile.name.trim();
+  const name = draft.name.trim();
 
   const handleContinue = async () => {
     setIsSaving(true);

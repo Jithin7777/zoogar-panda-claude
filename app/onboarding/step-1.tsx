@@ -7,11 +7,11 @@ import { Card } from '../../components/Card';
 import { OnboardingLayout } from '../../components/OnboardingLayout';
 import { TextField } from '../../components/TextField';
 import { spacing } from '../../constants/theme';
-import { useProfile } from '../../context/ProfileContext';
+import { useOnboardingDraft } from '../../hooks/useOnboardingDraft';
 import { stepOneSchema } from '../../lib/validation';
 
 export default function OnboardingStepOne() {
-  const { profile, updateDraft } = useProfile();
+  const { draft, updateDraft } = useOnboardingDraft();
   const ageRef = useRef<TextInput>(null);
   const {
     control,
@@ -20,7 +20,7 @@ export default function OnboardingStepOne() {
   } = useForm({
     resolver: zodResolver(stepOneSchema),
     mode: 'onChange',
-    defaultValues: { name: profile.name, age: profile.age },
+    defaultValues: { name: draft.name, age: draft.age },
   });
 
   return (
