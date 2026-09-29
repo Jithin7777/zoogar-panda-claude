@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useDailyLogStore } from '../stores/dailyLogStore';
 import { useProfileStore } from '../stores/profileStore';
 import { useSessionStore } from '../stores/sessionStore';
 
@@ -8,7 +9,11 @@ type HydrationApi = {
 };
 
 // Every persisted store the app must wait for before rendering.
-const persistedStores: HydrationApi[] = [useSessionStore.persist, useProfileStore.persist];
+const persistedStores: HydrationApi[] = [
+  useSessionStore.persist,
+  useProfileStore.persist,
+  useDailyLogStore.persist,
+];
 
 const allHydrated = () => persistedStores.every((store) => store.hasHydrated());
 

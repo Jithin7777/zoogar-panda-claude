@@ -4,6 +4,7 @@ import { PersistStorage, StorageValue } from 'zustand/middleware';
 export const STORAGE_KEYS = {
   session: 'zoogar_session',
   profile: 'zoogar_profile',
+  dailyLogs: 'zoogar_daily_logs',
 };
 
 // Keys written by the old AuthContext/ProfileContext. Their data is dev/test
@@ -11,7 +12,7 @@ export const STORAGE_KEYS = {
 const LEGACY_STORAGE_KEYS = ['zoogar_auth_user', 'zoogar_user_profile'];
 const LEGACY_CLEANUP_DONE_KEY = 'zoogar_legacy_keys_cleared';
 
-function warnInDev(message: string, error?: unknown) {
+export function warnInDev(message: string, error?: unknown) {
   if (__DEV__) console.warn(`[storage] ${message}`, error ?? '');
 }
 

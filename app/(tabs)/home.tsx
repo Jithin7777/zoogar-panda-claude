@@ -1,5 +1,6 @@
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { DailySugarIntakeCard } from "../../components/home/DailySugarIntakeCard";
 import { HomeNavbar } from "../../components/home/HomeNavbar";
 import { HomeWelcome } from "../../components/home/HomeWelcome";
 import { StreakCalendarCard } from "../../components/home/StreakCalendarCard";
@@ -45,6 +46,11 @@ export default function HomeScreen() {
           goalGrams={MOCK_SUGAR_TODAY.goalGrams}
           lowLimitGrams={MOCK_SUGAR_TODAY.lowLimitGrams}
         />
+      </View>
+
+      {/* Subscribes to the daily log itself, so logging a meal re-renders only this card. */}
+      <View className="mt-md">
+        <DailySugarIntakeCard />
       </View>
 
       <View className="mt-md">

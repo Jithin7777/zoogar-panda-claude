@@ -1,3 +1,4 @@
+import { useDailyLogStore } from '../stores/dailyLogStore';
 import { useOnboardingStore } from '../stores/onboardingStore';
 import { useProfileStore } from '../stores/profileStore';
 import { useSessionStore } from '../stores/sessionStore';
@@ -8,9 +9,11 @@ export async function resetAppData() {
   useSessionStore.getState().clear();
   useProfileStore.getState().reset();
   useOnboardingStore.getState().reset();
+  useDailyLogStore.getState().reset();
 
   // The resets above also re-save the initial state; whichever write lands
   // last, the next launch hydrates to the same empty state.
   useSessionStore.persist.clearStorage();
   useProfileStore.persist.clearStorage();
+  useDailyLogStore.persist.clearStorage();
 }

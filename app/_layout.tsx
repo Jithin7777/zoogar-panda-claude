@@ -7,11 +7,13 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DevResetButton } from '../components/DevResetButton';
 import { colors } from '../constants/theme';
+import { useDayRollover } from '../hooks/useDayRollover';
 import { useStoresHydrated } from '../hooks/useStoresHydrated';
 import { clearLegacyStorageOnce } from '../lib/storage';
 
 function AppGate() {
   const storesHydrated = useStoresHydrated();
+  useDayRollover();
 
   useEffect(() => {
     if (storesHydrated) clearLegacyStorageOnce();
