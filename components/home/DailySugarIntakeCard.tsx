@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ComponentProps, ReactNode, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import Animated, { FadeIn, FadeOut, LayoutAnimationConfig, ZoomIn } from 'react-native-reanimated';
 import { colors } from '../../constants/theme';
 import { useLogMeal } from '../../hooks/useLogMeal';
 import { CheckInMeal, useMealCheckIn } from '../../hooks/useMealCheckIn';
@@ -11,6 +12,17 @@ import { SUGAR_LEVEL_LABELS, SugarLevelSlider } from '../SugarLevelSlider';
 import { MealStatusRow } from './MealStatusRow';
 
 type JustSaved = { name: string; entry: MealEntry };
+
+// Crossfade between card states: the old content fades out quickly while the
+// new content waits briefly, then fades in.
+const BODY_EXIT_MS = 120;
+const BODY_ENTER_MS = 200;
+const BODY_ENTER_DELAY_MS = 100;
+
+const bodyEntering = FadeIn.duration(BODY_ENTER_MS).delay(BODY_ENTER_DELAY_MS);
+const bodyExiting = FadeOut.duration(BODY_EXIT_MS);
+// Success tick pops in with a gentle spring once the new content appears.
+const successIconEntering = ZoomIn.springify().damping(14).delay(BODY_ENTER_DELAY_MS);
 
 function CardShell({ children }: { children: ReactNode }) {
   return (
@@ -34,12 +46,17 @@ function StatusMessage({
   const success = tone === 'success';
   return (
     <View className="flex-row items-center">
-      <View
-        className={`w-[44px] h-[44px] rounded-full items-center justify-center mr-sm ${
-          success ? 'bg-primaryLight' : 'bg-surface'
-        }`}
-      >
-        <Ionicons name={icon} size={24} color={success ? colors.primary : colors.textSecondary} />
+      {/* Margin sits outside the animated view so the pop scales from the circle's center. */}
+      <View className="mr-sm">
+        <Animated.View entering={success ? successIconEntering : undefined}>
+          <View
+            className={`w-[44px] h-[44px] rounded-full items-center justify-center ${
+              success ? 'bg-primaryLight' : 'bg-surface'
+            }`}
+          >
+            <Ionicons name={icon} size={24} color={success ? colors.primary : colors.textSecondary} />
+          </View>
+        </Animated.View>
       </View>
       <Text className={`flex-1 text-sm ${success ? 'font-semibold text-primaryDark' : 'text-textPrimary'}`}>
         {children}
@@ -174,8 +191,12 @@ export function DailySugarIntakeCard() {
     setSelectedMealIndex(null);
   };
 
+  // bodyKey names the visual state; a new key crossfades the body. Slider,
+  // error and missed-pill changes keep the key, so the form doesn't re-animate.
   let body: ReactNode;
+  let bodyKey = 'empty';
   if (justSaved) {
+    bodyKey = `saved-${justSaved.entry.mealIndex}`;
     body = (
       <>
         <StatusMessage icon="checkmark" tone="success">
@@ -188,18 +209,21 @@ export function DailySugarIntakeCard() {
       </>
     );
   } else if (previewMeal) {
+    bodyKey = `preview-${previewMeal.mealIndex}`;
     body = (
       <StatusMessage icon="time-outline" tone="neutral">
         {opensAtText(previewMeal)}
       </StatusMessage>
     );
   } else if (isComplete) {
+    bodyKey = 'complete';
     body = (
       <StatusMessage icon="checkmark" tone="success">
         All meals checked in for today. Nice work!
       </StatusMessage>
     );
   } else if (focusMeal) {
+    bodyKey = `form-${focusMeal.mealIndex}`;
     const mealName = focusMeal.name;
     body = (
       <>
@@ -228,6 +252,7 @@ export function DailySugarIntakeCard() {
       </>
     );
   } else if (nextUpcoming) {
+    bodyKey = `waiting-${nextUpcoming.mealIndex}`;
     body = (
       <StatusMessage icon="time-outline" tone="neutral">
         {loggedCount === 0 ? opensAtText(nextUpcoming) : `You're all caught up. ${opensAtText(nextUpcoming)}`}
@@ -237,10 +262,20 @@ export function DailySugarIntakeCard() {
 
   return (
     <CardShell>
-      <View className="mt-md">
-        <MealStatusRow meals={meals} highlightedIndex={highlightedIndex} onSelectMeal={selectMeal} />
-      </View>
-      <View className="mt-md">{body}</View>
+      {/* Animations run only for changes while the card is on screen, not
+          when Home first renders or the card unmounts. */}
+      <LayoutAnimationConfig skipEntering skipExiting>
+        <View className="mt-md">
+          <MealStatusRow meals={meals} highlightedIndex={highlightedIndex} onSelectMeal={selectMeal} />
+        </View>
+        {/* overflow-hidden keeps fading-out content (e.g. the taller form)
+            inside the card while the card has already resized. */}
+        <View className="mt-md overflow-hidden">
+          <Animated.View key={bodyKey} entering={bodyEntering} exiting={bodyExiting}>
+            {body}
+          </Animated.View>
+        </View>
+      </LayoutAnimationConfig>
     </CardShell>
   );
 }
